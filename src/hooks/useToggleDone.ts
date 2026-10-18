@@ -1,7 +1,6 @@
 import { toast } from 'sonner'
 import { useUpdateItem } from '@/hooks/useItems'
-
-const UNDO_MS = 5000
+import { RUECKGAENGIG_MS } from '@/lib/constants'
 
 // Tick off / untick a task or event. When ticking off, show a
 // "Rückgängig" toast for a few seconds.
@@ -15,7 +14,7 @@ export function useToggleDone(table: 'tasks' | 'events') {
     )
     if (erledigt) {
       toast(`„${item.titel}“ erledigt`, {
-        duration: UNDO_MS,
+        duration: RUECKGAENGIG_MS,
         action: {
           label: 'Rückgängig',
           onClick: () => update.mutate({ id: item.id, erledigt: false }),

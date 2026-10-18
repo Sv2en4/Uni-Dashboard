@@ -10,20 +10,38 @@ type Props = {
   datum: string | null
   module?: Module
   extra?: string // e.g. event type
+  leaving?: boolean // just ticked off: strike through and fade out
+  dateClassName?: string
   onToggle?: (erledigt: boolean) => void // omitted = no checkbox
   onOpen: () => void
 }
 
 // One line in a list: checkbox, title, module and date. Click opens editing.
-export function ItemRow({ titel, erledigt, datum, module, extra, onToggle, onOpen }: Props) {
+export function ItemRow({
+  titel,
+  erledigt,
+  datum,
+  module,
+  extra,
+  leaving,
+  dateClassName,
+  onToggle,
+  onOpen,
+}: Props) {
+  const done = erledigt || leaving
   return (
-    <li className="flex items-center gap-3 px-3">
+    <li
+      className={cn(
+        'flex items-center gap-3 px-3 transition-opacity duration-300',
+        leaving && 'opacity-40',
+      )}
+    >
       {onToggle && (
         <Checkbox
-          checked={erledigt}
+          checked={done}
           onCheckedChange={(v) => onToggle(v === true)}
           aria-label={erledigt ? `${titel} wieder öffnen` : `${titel} abhaken`}
-          className="size-5"
+          className="size-5 transition-transform data-[state=checked]:scale-110"
         />
       )}
       <button
@@ -31,7 +49,12 @@ export function ItemRow({ titel, erledigt, datum, module, extra, onToggle, onOpe
         onClick={onOpen}
         className="flex min-h-12 flex-1 items-center gap-3 overflow-hidden text-left"
       >
-        <span className={cn('flex-1 truncate', erledigt && 'text-muted-foreground line-through')}>
+        <span
+          className={cn(
+            'flex-1 truncate decoration-muted-foreground transition-colors',
+            done && 'text-muted-foreground line-through',
+          )}
+        >
           {titel}
         </span>
         {extra && <span className="shrink-0 text-xs text-muted-foreground">{extra}</span>}
@@ -42,7 +65,12 @@ export function ItemRow({ titel, erledigt, datum, module, extra, onToggle, onOpe
           </span>
         )}
         {datum && (
-          <span className="w-20 shrink-0 text-right text-xs text-muted-foreground tabular-nums">
+          <span
+            className={cn(
+              'w-20 shrink-0 text-right text-xs text-muted-foreground tabular-nums',
+              dateClassName,
+            )}
+          >
             {formatDatum(datum)}
           </span>
         )}
