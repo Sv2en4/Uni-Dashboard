@@ -69,5 +69,13 @@ Adding and ticking off tasks/events must take seconds, on MacBook and iPhone.
 6. Main page with all four sections, countdown and last-activity logic
 7. Design polish, dark mode, mobile view
 8. PWA + deploy to Vercel (guide through GitHub and Vercel)
-   - **Open TODO:** set up custom SMTP in Supabase (Gmail app password or Resend), then add `{{ .Token }}` to the "Confirm signup" and "Magic Link" email templates. Templates cannot be edited with Supabase's built-in email sender. Without the code, login inside the installed iOS PWA does not work.
    - Add the Vercel URL to Supabase Auth → URL Configuration (Site URL + Redirect URLs).
+
+## Open TODO: login on the iPhone (postponed by the user)
+Why: on iOS, the installed home-screen app has its own storage. A magic link from Mail always opens in Safari, so the app itself stays logged out. Fix: log in with the code from the email instead.
+Already done in code: `LoginPage.tsx` shows a code field after sending the email (`verifyOtp`, type `email`).
+Still to do (Supabase dashboard only, no code changes):
+1. Set up custom SMTP (Project Settings → Authentication → SMTP), e.g. Gmail with an app password or Resend. Required, because email templates are locked with the built-in sender. Also lifts the limit of a few emails per hour.
+2. Authentication → Emails → Templates: add the code to "Magic Link" (and "Confirm signup"):
+   `<p><a href="{{ .ConfirmationURL }}">Hier klicken zum Einloggen</a></p><p>Oder diesen Code in der App eingeben: <strong>{{ .Token }}</strong></p>`
+3. Test: open the installed app on the iPhone → enter email → type the code from the email.
