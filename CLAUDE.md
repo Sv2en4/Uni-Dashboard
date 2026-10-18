@@ -67,3 +67,5 @@ Adding and ticking off tasks/events must take seconds, on MacBook and iPhone.
 6. Main page with all four sections, countdown and last-activity logic
 7. Design polish, dark mode, mobile view
 8. PWA + deploy to Vercel (guide through GitHub and Vercel)
+   - **Open TODO:** set up custom SMTP in Supabase (Gmail app password or Resend), then add `{{ .Token }}` to the "Confirm signup" and "Magic Link" email templates. Templates cannot be edited with Supabase's built-in email sender. Without the code, login inside the installed iOS PWA does not work.
+   - Add the Vercel URL to Supabase Auth → URL Configuration (Site URL + Redirect URLs).
