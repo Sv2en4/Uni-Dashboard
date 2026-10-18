@@ -71,6 +71,14 @@ Adding and ticking off tasks/events must take seconds, on MacBook and iPhone.
 8. PWA + deploy to Vercel (guide through GitHub and Vercel)
    - Add the Vercel URL to Supabase Auth → URL Configuration (Site URL + Redirect URLs).
 
+## Status and deployment
+- All 8 stages done (2026-10-18). Live: https://uni-dashboard-red.vercel.app
+- GitHub repo `uni-dashboard` (private), pushed via GitHub Desktop. Vercel deploys every push to `main` automatically.
+- Env vars on Vercel: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`.
+- Supabase Auth URLs: Site URL = Vercel URL; Redirect URLs = Vercel URL `/**` and `http://localhost:5173/**`.
+- Sign-ups are disabled in Supabase (single user).
+- Local dev: `npm run dev` (http://localhost:5173), `npm test`, `npm run build`.
+
 ## Open TODO: login on the iPhone (postponed by the user)
 Why: on iOS, the installed home-screen app has its own storage. A magic link from Mail always opens in Safari, so the app itself stays logged out. Fix: log in with the code from the email instead.
 Already done in code: `LoginPage.tsx` shows a code field after sending the email (`verifyOtp`, type `email`).
