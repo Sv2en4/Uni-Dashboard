@@ -22,6 +22,7 @@ Adding and ticking off tasks/events must take seconds, on MacBook and iPhone.
 - PWA via `vite-plugin-pwa`
 - Hosting: Vercel, connected to GitHub (via web UI, no CLI)
 - Auth: magic link (email) only. Single user. **Remind the user to disable new sign-ups in Supabase after they register.**
+  The email template also contains the one-time code (`{{ .Token }}`); the login page accepts it too, because on iOS a magic link opens in Safari, not in the installed PWA.
 - Secrets only in `.env.local` (git-ignored). Keep `.env.example` without values.
 
 ## Data model
