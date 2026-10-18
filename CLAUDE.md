@@ -87,3 +87,7 @@ Still to do (Supabase dashboard only, no code changes):
 2. Authentication → Emails → Templates: add the code to "Magic Link" (and "Confirm signup"):
    `<p><a href="{{ .ConfirmationURL }}">Hier klicken zum Einloggen</a></p><p>Oder diesen Code in der App eingeben: <strong>{{ .Token }}</strong></p>`
 3. Test: open the installed app on the iPhone → enter email → type the code from the email.
+
+Same problem with the macOS "Add to Dock" web app (confirmed by the user): the link opens in normal Safari, the Dock app stays logged out. Only needed once per device, the session then persists.
+
+Alternative without SMTP (not built yet, user postponed it): a "paste login link" field on the login page. Read the `token` and `type` parameters from the pasted Supabase verify URL and call `supabase.auth.verifyOtp({ token_hash, type })`. Verify first that this is accepted with the implicit flow.
