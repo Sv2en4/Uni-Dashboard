@@ -48,6 +48,8 @@ Adding and ticking off tasks/events must take seconds, on MacBook and iPhone.
 ## Quick entry syntax
 - `#kuerzel` sets the module; `heute`, `morgen`, weekday abbreviations (`mo di mi do fr sa so`), `24.10.` set the date
 - Events: `!pruefung`, `!test` (→ zwischentest), `!abgabe` (default: abgabe)
+- Extras: `übermorgen`, full weekday names, `!klausur`/`!prüfung` (→ pruefung), `24.10.2027`. A `!type` switches the entry to "Termin" even if the toggle says "Aufgabe".
+- Parser lives in `src/lib/parser.ts` with tests in `parser.test.ts` (`npm test`). Keep tests green when changing it.
 - Enter saves, field stays focused; `N` focuses the field; preview of parsed values below the field
 
 ## UI rules
