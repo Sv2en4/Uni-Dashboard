@@ -32,7 +32,7 @@ export function UpcomingEvents({ events, moduleById, onOpen }: Props) {
 
   return (
     // phone: swipe horizontally; desktop: all cards in one row
-    <ul className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1 sm:mx-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0 lg:grid-cols-5">
+    <ul className="no-scrollbar -mx-4 flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto px-4 pb-1 sm:mx-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0 lg:grid-cols-5">
       {upcoming.map((e) => {
         const days = daysUntil(e.datum)
         const style = URGENCY_STYLES[eventUrgency(days)]
@@ -41,16 +41,16 @@ export function UpcomingEvents({ events, moduleById, onOpen }: Props) {
           <li
             key={e.id}
             className={cn(
-              'relative w-[70%] shrink-0 snap-start rounded-xl border bg-card transition-colors hover:bg-muted/40 sm:w-auto',
+              'relative w-[44%] min-w-40 shrink-0 snap-start rounded-xl border bg-card transition-colors hover:bg-muted/40 sm:w-auto',
               style.border,
             )}
           >
             <button
               type="button"
               onClick={() => onOpen(e)}
-              className="flex h-full w-full flex-col gap-3 p-4 text-left"
+              className="flex h-full w-full flex-col gap-2 p-3.5 text-left sm:gap-3 sm:p-4"
             >
-              <span className={cn('pr-6 text-xl font-semibold tracking-tight', style.text)}>
+              <span className={cn('pr-6 text-lg font-semibold tracking-tight sm:text-xl', style.text)}>
                 {countdownText(days)}
               </span>
               <span className="flex flex-col gap-1">
@@ -67,12 +67,14 @@ export function UpcomingEvents({ events, moduleById, onOpen }: Props) {
               </span>
             </button>
             {e.typ === 'abgabe' && (
-              <Checkbox
-                checked={false}
-                onCheckedChange={() => toggle(e, true)}
-                aria-label={`${e.titel} abhaken`}
-                className="absolute top-4 right-4 size-5"
-              />
+              <label className="absolute top-1 right-1 flex cursor-pointer p-3">
+                <Checkbox
+                  checked={false}
+                  onCheckedChange={() => toggle(e, true)}
+                  aria-label={`${e.titel} abhaken`}
+                  className="size-5 rounded-full"
+                />
+              </label>
             )}
           </li>
         )

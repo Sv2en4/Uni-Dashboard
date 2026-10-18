@@ -15,7 +15,10 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <App />
-      <Toaster position="bottom-center" />
+      <Toaster
+        position="bottom-center"
+        mobileOffset={{ bottom: 'calc(env(safe-area-inset-bottom) + 16px)' }}
+      />
     </QueryClientProvider>
   </StrictMode>,
 )

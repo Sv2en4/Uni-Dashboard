@@ -37,17 +37,19 @@ export function ItemRow({
       )}
     >
       {onToggle && (
-        <Checkbox
-          checked={done}
-          onCheckedChange={(v) => onToggle(v === true)}
-          aria-label={erledigt ? `${titel} wieder öffnen` : `${titel} abhaken`}
-          className="size-5 transition-transform data-[state=checked]:scale-110"
-        />
+        <label className="-m-3 flex cursor-pointer items-center p-3">
+          <Checkbox
+            checked={done}
+            onCheckedChange={(v) => onToggle(v === true)}
+            aria-label={erledigt ? `${titel} wieder öffnen` : `${titel} abhaken`}
+            className="size-5 rounded-full transition-transform duration-200 data-[state=checked]:scale-110"
+          />
+        </label>
       )}
       <button
         type="button"
         onClick={onOpen}
-        className="flex min-h-12 flex-1 items-center gap-3 overflow-hidden text-left"
+        className="flex min-h-12 flex-1 items-center gap-3 overflow-hidden text-left outline-none focus-visible:underline"
       >
         <span
           className={cn(

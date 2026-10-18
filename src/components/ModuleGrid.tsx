@@ -50,7 +50,7 @@ export function ModuleGrid({ status, selectedId, onSelect }: Props) {
   }
 
   return (
-    <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+    <ul className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-1 xl:grid-cols-2">
       {sorted.map((m) => {
         const selected = selectedId === m.id
         const workedToday = m.days !== null && m.days <= 0
@@ -66,13 +66,13 @@ export function ModuleGrid({ status, selectedId, onSelect }: Props) {
               type="button"
               onClick={() => onSelect(selected ? null : m.id)}
               aria-pressed={selected}
-              className="flex flex-1 flex-col gap-2 p-4 pb-2 text-left"
+              className="flex flex-1 flex-col gap-1.5 p-3 pb-1 text-left sm:gap-2 sm:p-4 sm:pb-2"
             >
-              <span className="flex items-start gap-2 font-medium">
+              <span className="flex items-start gap-2 text-sm font-medium sm:text-base">
                 <ModuleDot color={m.farbe} className="mt-1.5" />
-                <span className="line-clamp-2">{m.name}</span>
+                <span className="line-clamp-2 hyphens-auto break-words">{m.name}</span>
               </span>
-              <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <span className="flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
                 zuletzt
                 <span
                   className={cn(
@@ -96,11 +96,11 @@ export function ModuleGrid({ status, selectedId, onSelect }: Props) {
                 </span>
               )}
             </button>
-            <div className="px-2 pb-2">
+            <div className="px-1 pb-1 sm:px-2 sm:pb-2">
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-9 w-full justify-start text-muted-foreground"
+                className="h-10 w-full justify-start px-2 text-xs text-muted-foreground sm:h-9 sm:text-sm"
                 disabled={touch.isPending}
                 onClick={() =>
                   touch.mutate(m.id, {

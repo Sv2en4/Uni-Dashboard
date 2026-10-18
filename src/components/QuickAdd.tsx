@@ -82,7 +82,7 @@ export function QuickAdd() {
                 inputRef.current?.focus()
               }}
               className={cn(
-                'rounded-md px-3 text-sm transition-colors',
+                'rounded-md px-2.5 text-sm transition-colors sm:px-3',
                 parsed.mode === m
                   ? 'bg-muted font-medium text-foreground'
                   : 'text-muted-foreground hover:text-foreground',
@@ -114,9 +114,11 @@ export function QuickAdd() {
 function Preview({ text, parsed }: { text: string; parsed: ReturnType<typeof parseQuickInput> }) {
   if (!text.trim()) {
     return (
-      <p className="px-1 text-xs text-muted-foreground">
-        <kbd className="rounded border px-1 font-sans">N</kbd> zum Eintippen · #kürzel · heute,
-        morgen, fr, 24.10. · !pruefung, !test, !abgabe
+      <p className="truncate px-1 text-xs text-muted-foreground">
+        <span className="hidden sm:inline">
+          <kbd className="rounded border px-1 font-sans">N</kbd> zum Eintippen ·{' '}
+        </span>
+        #kürzel · heute, morgen, fr, 24.10. · !pruefung, !test, !abgabe
       </p>
     )
   }

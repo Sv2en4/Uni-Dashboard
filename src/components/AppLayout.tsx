@@ -6,7 +6,7 @@ import { supabase } from '@/lib/supabase'
 // Frame for all logged-in pages: small header + page content.
 export function AppLayout() {
   return (
-    <div className="mx-auto min-h-svh max-w-5xl px-4 pb-16 sm:px-6">
+    <div className="mx-auto min-h-svh max-w-5xl px-[max(1rem,env(safe-area-inset-left))] pt-[env(safe-area-inset-top)] pb-[max(4rem,env(safe-area-inset-bottom))] sm:px-6">
       <header className="flex h-14 items-center justify-between">
         <Link to="/" className="font-semibold tracking-tight">
           Uni-Dashboard

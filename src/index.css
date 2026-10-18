@@ -131,6 +131,10 @@
     cursor: pointer;
     }
   html {
-    @apply font-sans;
+    @apply font-sans antialiased;
+    -webkit-tap-highlight-color: transparent;
     }
+  /* hide the scrollbar of the swipeable event row on phones */
+  .no-scrollbar { scrollbar-width: none; }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
 }
