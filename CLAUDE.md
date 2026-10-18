@@ -30,6 +30,10 @@ Adding and ticking off tasks/events must take seconds, on MacBook and iPhone.
 - **events**: id, user_id, module_id (**nullable**, deviates from spec), titel, typ (`pruefung` | `zwischentest` | `abgabe`), datum (date, required), erledigt, erledigt_am, created_at
 - RLS on all tables: users only see and change their own rows.
 - View `module_status`: per module, last activity = max(erledigt_am of its tasks and events, modules.last_touched_at), plus count of open tasks and next open event.
+- `user_id` defaults to `auth.uid()`: the frontend never sends it.
+- `erledigt_am` is set/cleared by a DB trigger when `erledigt` changes: the frontend only toggles `erledigt`.
+- `module_status` uses `security_invoker = true` (respects RLS) and computes "today" in `Europe/Berlin`.
+- Migrations are run manually in the SQL Editor; never edit an applied migration, add a new numbered file instead.
 
 ## Decisions on ambiguous points
 1. Events can exist without a module (`module_id` nullable).
