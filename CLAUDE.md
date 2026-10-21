@@ -21,7 +21,7 @@ Adding and ticking off tasks/events must take seconds, on MacBook and iPhone.
 - Vitest for unit tests (at minimum `src/lib/parser.ts` and date helpers)
 - PWA via `vite-plugin-pwa`
 - Hosting: Vercel, connected to GitHub (via web UI, no CLI)
-- Auth: magic link (email) only. Single user. **Remind the user to disable new sign-ups in Supabase after they register.**
+- Auth: email + password (default on `/login`, password is set under Einstellungen → Passwort via `updateUser`) and magic link as fallback. Single user. **Remind the user to disable new sign-ups in Supabase after they register.**
   The email template also contains the one-time code (`{{ .Token }}`); the login page accepts it too, because on iOS a magic link opens in Safari, not in the installed PWA.
 - Secrets only in `.env.local` (git-ignored). Keep `.env.example` without values.
 
@@ -79,15 +79,7 @@ Adding and ticking off tasks/events must take seconds, on MacBook and iPhone.
 - Sign-ups are disabled in Supabase (single user).
 - Local dev: `npm run dev` (http://localhost:5173), `npm test`, `npm run build`.
 
-## Open TODO: login on the iPhone (postponed by the user)
-Why: on iOS, the installed home-screen app has its own storage. A magic link from Mail always opens in Safari, so the app itself stays logged out. Fix: log in with the code from the email instead.
-Already done in code: `LoginPage.tsx` shows a code field after sending the email (`verifyOtp`, type `email`).
-Still to do (Supabase dashboard only, no code changes):
-1. Set up custom SMTP (Project Settings → Authentication → SMTP), e.g. Gmail with an app password or Resend. Required, because email templates are locked with the built-in sender. Also lifts the limit of a few emails per hour.
-2. Authentication → Emails → Templates: add the code to "Magic Link" (and "Confirm signup"):
-   `<p><a href="{{ .ConfirmationURL }}">Hier klicken zum Einloggen</a></p><p>Oder diesen Code in der App eingeben: <strong>{{ .Token }}</strong></p>`
-3. Test: open the installed app on the iPhone → enter email → type the code from the email.
-
-Same problem with the macOS "Add to Dock" web app (confirmed by the user): the link opens in normal Safari, the Dock app stays logged out. Only needed once per device, the session then persists.
-
-Alternative without SMTP (not built yet, user postponed it): a "paste login link" field on the login page. Read the `token` and `type` parameters from the pasted Supabase verify URL and call `supabase.auth.verifyOtp({ token_hash, type })`. Verify first that this is accepted with the implicit flow.
+## Login on iPhone / Dock app
+On iOS the home-screen app (and the macOS Dock web app) has its own storage, and a magic link from Mail opens in Safari, so the app stays logged out.
+Solution (2026-10-21): password login. The password manager (iCloud Keychain) fills email + password inside the app. Only needed once per device; the session then persists.
+Still possible but optional: custom SMTP plus `{{ .Token }}` in the email template, so the code field after "Login-Link senden" works too.

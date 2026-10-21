@@ -1,10 +1,14 @@
-import { useState } from 'react'
+import { useState, type FormEvent } from 'react'
 import { Archive, ArchiveRestore, ChevronRight, Plus } from 'lucide-react'
 import { toast } from 'sonner'
 import { ModuleDialog } from '@/components/ModuleDialog'
 import { ModuleDot } from '@/components/ModuleDot'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { useAuth } from '@/hooks/useAuth'
 import { useModules, useUpdateModule } from '@/hooks/useModules'
+import { supabase } from '@/lib/supabase'
 import type { Module } from '@/lib/types'
 
 export function SettingsPage() {
@@ -113,9 +117,80 @@ export function SettingsPage() {
         </section>
       )}
 
+      <PasswordSection />
+
       <ModuleDialog open={dialogOpen} onOpenChange={setDialogOpen} module={editing} />
     </div>
   )
+}
+
+// Sets the password for the email + password login, so later logins on any
+// device need no email: the password manager fills in both fields.
+function PasswordSection() {
+  const { session } = useAuth()
+  const [password, setPassword] = useState('')
+  const [busy, setBusy] = useState(false)
+
+  async function save(e: FormEvent) {
+    e.preventDefault()
+    setBusy(true)
+    const { error } = await supabase.auth.updateUser({ password })
+    setBusy(false)
+    if (error) {
+      toast.error(passwordError(error.message))
+      return
+    }
+    setPassword('')
+    toast('Passwort gespeichert')
+  }
+
+  return (
+    <section className="space-y-3">
+      <h2 className="text-sm font-medium text-muted-foreground">Passwort</h2>
+      <form onSubmit={save} className="space-y-3 rounded-lg border p-4">
+        <p className="text-sm text-muted-foreground">
+          Damit kannst du dich auf jedem Gerät mit E-Mail und Passwort anmelden, ohne Login-Link.
+          Lass es vom Schlüsselbund speichern, dann reicht später Face ID oder Touch ID.
+        </p>
+        {/* hidden, tells the password manager which account the password belongs to */}
+        <input
+          type="email"
+          name="username"
+          autoComplete="username"
+          value={session?.user.email ?? ''}
+          readOnly
+          hidden
+        />
+        <div className="space-y-1.5">
+          <Label htmlFor="new-password">Neues Passwort</Label>
+          <Input
+            id="new-password"
+            type="password"
+            autoComplete="new-password"
+            minLength={8}
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="h-11"
+          />
+        </div>
+        <Button type="submit" className="h-11" disabled={busy}>
+          {busy ? 'Speichert …' : 'Passwort speichern'}
+        </Button>
+      </form>
+    </section>
+  )
+}
+
+function passwordError(message: string): string {
+  const m = message.toLowerCase()
+  if (m.includes('different from the old'))
+    return 'Das neue Passwort muss sich vom alten unterscheiden.'
+  if (m.includes('weak') || m.includes('at least'))
+    return 'Das Passwort ist zu schwach. Nimm ein längeres.'
+  if (m.includes('reauthentication'))
+    return 'Supabase verlangt eine erneute Bestätigung. Melde dich ab und wieder an, dann versuch es noch einmal.'
+  return `Fehler: ${message}`
 }
 
 function ModuleRow({

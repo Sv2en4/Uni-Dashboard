@@ -6,18 +6,39 @@ import { Label } from '@/components/ui/label'
 import { useAuth } from '@/hooks/useAuth'
 import { supabase } from '@/lib/supabase'
 
-// Login with magic link. The email also contains a code: typing it in works
-// inside the installed iPhone app, where opening the link would land in Safari.
+// Default: email + password, so the password manager (iCloud Keychain) can fill
+// it in, also inside the installed app. Fallback: magic link, whose email also
+// contains a code to type in (a link from Mail would open in Safari, not the app).
+// The password itself is set in the settings while logged in.
+type Mode = 'password' | 'link' | 'code'
+
 export function LoginPage() {
   const { session, loading } = useAuth()
+  const [mode, setMode] = useState<Mode>('password')
   const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [code, setCode] = useState('')
-  const [sent, setSent] = useState(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
 
   if (loading) return null
   if (session) return <Navigate to="/" replace />
+
+  function switchMode(next: Mode) {
+    setMode(next)
+    setCode('')
+    setError('')
+  }
+
+  async function signInWithPassword(e: FormEvent) {
+    e.preventDefault()
+    setBusy(true)
+    setError('')
+    const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password })
+    setBusy(false)
+    if (error) setError(germanError(error.message))
+    // on success, AuthProvider gets the session and we redirect automatically
+  }
 
   async function sendLink(e: FormEvent) {
     e.preventDefault()
@@ -29,7 +50,7 @@ export function LoginPage() {
     })
     setBusy(false)
     if (error) setError(germanError(error.message))
-    else setSent(true)
+    else switchMode('code')
   }
 
   async function verifyCode(e: FormEvent) {
@@ -43,40 +64,73 @@ export function LoginPage() {
     })
     setBusy(false)
     if (error) setError(germanError(error.message))
-    // on success, AuthProvider gets the session and we redirect automatically
   }
+
+  const emailField = (
+    <div className="space-y-1.5">
+      <Label htmlFor="email">E-Mail</Label>
+      <Input
+        id="email"
+        type="email"
+        autoComplete="username"
+        required
+        autoFocus
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        className="h-11"
+      />
+    </div>
+  )
 
   return (
     <main className="mx-auto flex min-h-svh max-w-sm flex-col justify-center gap-6 px-4">
       <div className="space-y-1">
         <h1 className="text-2xl font-semibold tracking-tight">Uni-Dashboard</h1>
         <p className="text-sm text-muted-foreground">
-          {sent
-            ? `Wir haben dir eine E-Mail an ${email.trim()} geschickt. Klick auf den Link oder gib den Code ein.`
-            : 'Melde dich mit deiner E-Mail-Adresse an. Du bekommst einen Link zum Einloggen.'}
+          {mode === 'password' && 'Melde dich mit E-Mail und Passwort an.'}
+          {mode === 'link' && 'Du bekommst eine E-Mail mit einem Link und einem Code zum Einloggen.'}
+          {mode === 'code' &&
+            `Wir haben dir eine E-Mail an ${email.trim()} geschickt. Klick auf den Link oder gib den Code ein.`}
         </p>
       </div>
 
-      {!sent ? (
-        <form onSubmit={sendLink} className="space-y-3">
+      {mode === 'password' && (
+        <form onSubmit={signInWithPassword} className="space-y-3">
+          {emailField}
           <div className="space-y-1.5">
-            <Label htmlFor="email">E-Mail</Label>
+            <Label htmlFor="password">Passwort</Label>
             <Input
-              id="email"
-              type="email"
-              autoComplete="email"
+              id="password"
+              type="password"
+              autoComplete="current-password"
               required
-              autoFocus
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               className="h-11"
             />
           </div>
           <Button type="submit" className="h-11 w-full" disabled={busy}>
-            {busy ? 'Wird gesendet …' : 'Login-Link senden'}
+            {busy ? 'Prüfe …' : 'Einloggen'}
+          </Button>
+          <Button type="button" variant="ghost" className="h-11 w-full" onClick={() => switchMode('link')}>
+            Stattdessen Login-Link per E-Mail
           </Button>
         </form>
-      ) : (
+      )}
+
+      {mode === 'link' && (
+        <form onSubmit={sendLink} className="space-y-3">
+          {emailField}
+          <Button type="submit" className="h-11 w-full" disabled={busy}>
+            {busy ? 'Wird gesendet …' : 'Login-Link senden'}
+          </Button>
+          <Button type="button" variant="ghost" className="h-11 w-full" onClick={() => switchMode('password')}>
+            Mit Passwort anmelden
+          </Button>
+        </form>
+      )}
+
+      {mode === 'code' && (
         <form onSubmit={verifyCode} className="space-y-3">
           <div className="space-y-1.5">
             <Label htmlFor="code">Code aus der E-Mail</Label>
@@ -95,16 +149,7 @@ export function LoginPage() {
           <Button type="submit" className="h-11 w-full" disabled={busy}>
             {busy ? 'Prüfe …' : 'Einloggen'}
           </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            className="h-11 w-full"
-            onClick={() => {
-              setSent(false)
-              setCode('')
-              setError('')
-            }}
-          >
+          <Button type="button" variant="ghost" className="h-11 w-full" onClick={() => switchMode('link')}>
             Andere E-Mail verwenden
           </Button>
         </form>
@@ -117,6 +162,8 @@ export function LoginPage() {
 
 function germanError(message: string): string {
   const m = message.toLowerCase()
+  if (m.includes('invalid login credentials'))
+    return 'E-Mail oder Passwort ist falsch. Noch kein Passwort? Melde dich per Login-Link an und leg es in den Einstellungen fest.'
   if (m.includes('rate limit') || m.includes('security purposes'))
     return 'Zu viele Versuche. Bitte warte ein paar Minuten.'
   if (m.includes('expired') || m.includes('invalid'))
